@@ -61,8 +61,8 @@ def atom_features(atom,
     results = one_of_k_encoding_unk(
         atom.GetSymbol(),
         ['C','N','O', 'S','F','Si','P', 'Cl','Br','Mg','Na','Ca','Fe','As','Al','I','B','V','K','Tl',
-            'Yb','Sb','Sn','Ag','Pd','Co','Se','Ti','Zn','H', 'Li','Ge','Cu','Au','Ni','Cd','In',
-            'Mn','Zr','Cr','Pt','Hg','Pb','Unknown'
+        'Yb','Sb','Sn','Ag','Pd','Co','Se','Ti','Zn','H', 'Li','Ge','Cu','Au','Ni','Cd','In',
+        'Mn','Zr','Cr','Pt','Hg','Pb','Unknown'
         ]) + [atom.GetDegree()/10, atom.GetImplicitValence(), 
                 atom.GetFormalCharge(), atom.GetNumRadicalElectrons()] + \
                 one_of_k_encoding_unk(atom.GetHybridization(), [
