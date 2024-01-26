@@ -295,7 +295,7 @@ class TIP(nn.Module):
 		return data
 
 	def __get_ndata__(self):
-		return self.data.n_drug_feat, self.data.n_dd_et, self.data.n_prot, self.data.n_prot, self.data.n_drug
+		return self.data.d_feat.shape[1], self.data.n_dd_et, self.data.n_prot, self.data.n_prot, self.data.n_drug  # NOTE 240118
 
 	def __get_dimset__(self):
 		return self.settings.prot_drug_dim, self.settings.num_base, self.settings.n_embed, self.settings.n_hid1, self.settings.n_hid2
