@@ -42,3 +42,33 @@ def normalize_adj(adj: sp.csr_matrix) -> sp.coo_matrix:
 
     adj_norm = adj_.dot(degree_mat_inv_sqrt).transpose().dot(degree_mat_inv_sqrt).tocoo()
     return adj_norm
+
+def simmat2knngraph(sim_mat, topk=5, undirected=True):
+    """Construct KNN graph from similarity matrix
+
+    Args:
+        sim_mat (np.array): Similarity (correlation) matrix.
+            e.g. 
+            [[1.0, 0.2, 0.3],
+             [0.2, 1.0, 0.4],
+             [0.3, 0.4, 1.0]]
+        topk (int, optional): Top K. Defaults to 5.
+        undirected (bool, optional): Defaults to True.
+
+    """
+    # Cutting
+    update_sim = []
+    for v in sim_mat:
+        tmp = sorted(v,reverse=True)
+        threshold = tmp[topk]
+        v = np.where(v>threshold,1,0)
+        update_sim.append(v)
+    update_sim = np.array(update_sim)
+
+    # Convert to undirected graph
+    if undirected:
+        merged_sim = update_sim + update_sim.T
+        merged_sim = np.where(merged_sim>0,1,0)
+        return merged_sim
+    else:
+        return update_sim

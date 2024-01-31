@@ -72,7 +72,7 @@ class GcnInfomax(nn.Module):
     self.gamma = gamma
     self.prior = args.prior
     self.features_dim = args.hidden_size
-    self.embedding_dim = args.gat_hidden*8
+    self.embedding_dim = args.gat_hidden*8 # FIXME: args.num_heads1 ??
     self.local_d = FF_local(args, self.features_dim)
     self.global_d = FF_global(args, self.embedding_dim)
 
