@@ -59,10 +59,9 @@ def get_roc_score(model,
     acc_score = accuracy_score(labels_all, preds_all_)
     return roc_score, ap_score, f1_score_, acc_score
 
-def get_roc_score_flex(rec, emb, edges_pos: np.ndarray, edges_neg: Union[np.ndarray, List[list]], test = None) -> Tuple[float, float]:
+def get_roc_score_flex(rec, edges_pos: np.ndarray, edges_neg: Union[np.ndarray, List[list]], test = None) -> Tuple[float, float]:
     #model.eval()
     #rec, emb = model(features, adj, adj_tensor, drug_nums, return_embeddings = True)
-    emb = emb.detach().cpu().numpy()
     rec = rec.detach().cpu().numpy()
     adj_rec = rec
 
