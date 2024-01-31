@@ -7,10 +7,15 @@ Chem utils
 @author: I.Azuma
 """
 # %%
+import numpy as np
+
 from argparse import Namespace
 from typing import List, Tuple, Union
 
-from rdkit import Chem
+import rdkit
+from rdkit import Chem, DataStructs
+from rdkit.Chem import AllChem, Draw
+
 import torch
 
 # %%
@@ -231,3 +236,25 @@ def mol2graph(smiles_batch: List[str],
         mol_graphs.append(mol_graph)
     
     return mol_graphs
+
+def mols2simmat(smiles_list):
+    """_summary_
+
+    Args:
+        smiles_list (list): ['N[C@@H](CC1=CC=CC=C1)C(O)=O','C[N+](C)(C)CCO', ...]
+
+    Returns:
+        np.array: Similarity matrix.
+    """
+    # Obtain Morgan finger prints
+    mols = [Chem.MolFromSmiles(t) for t in smiles_list]
+    morgan_fps = [AllChem.GetMorganFingerprintAsBitVect(mol, 2, 2048) for mol in mols]
+
+    sim_mat = []
+    for i in range(len(smiles_list)):
+        morgan = DataStructs.BulkTanimotoSimilarity(morgan_fps[i], morgan_fps)
+        sim_mat.append(morgan)
+    sim_mat = np.array(sim_mat)
+    sim_mat = np.where(sim_mat==1,0,sim_mat) # Remove own correlation
+
+    return sim_mat
