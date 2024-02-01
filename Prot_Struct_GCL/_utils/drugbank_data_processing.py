@@ -78,6 +78,50 @@ def load_data(separate_train_path, separate_test_path, drug_list, fold=0):
 
     return adj, adj_train, adj_train_false, train_edges, train_edges_false, val_edges, val_edges_false, test_edges, test_edges_false
 
+def load_inductive_s1s2(file_path='/path/to/inductive_data/fold1', drug_list=[]):
+    # Load each data
+    df_ddi_train = pd.read_csv(file_path+'/train.csv')
+    df_ddi_s1 = pd.read_csv(file_path+'/s1.csv')
+    df_ddi_s2 = pd.read_csv(file_path+'/s2.csv')
+
+    # Rename columns
+    re_col = ['d1','d2','type','Neg samples','tmp']
+    df_ddi_train.columns = re_col
+    df_ddi_s1.columns = re_col
+    df_ddi_s2.columns = re_col
+
+    # Reorder known and unknown drugs
+    train_neg = [t.split('$')[0] for t in df_ddi_train['Neg samples'].tolist()]
+    known_drugs = (set(df_ddi_train['d1']) | set(df_ddi_train['d2'])) | set(train_neg)
+    known_drugs = sorted(list(known_drugs))
+    unknown_drugs = sorted(list(set(drug_list) - set(known_drugs)))
+    all_drugs = known_drugs + unknown_drugs
+
+    print('known drugs:',len(known_drugs))
+    print('unknown drugs:',len(unknown_drugs))
+    
+    train_edges, train_edges_false = csv2edgelist(df_ddi_train, all_drugs)
+    s1_edges, s1_edges_false = csv2edgelist(df_ddi_s1, all_drugs)
+    s2_edges, s2_edges_false = csv2edgelist(df_ddi_s2, all_drugs)
+
+    # Train + Val
+    num_nodes = len(all_drugs)
+    all_edges = np.concatenate([train_edges, s1_edges, s2_edges], axis=0) # NOTE: Undirected pairs
+    data = np.ones(all_edges.shape[0])
+    adj = sp.csr_matrix((data, (all_edges[:, 0], all_edges[:, 1])), shape=(num_nodes, num_nodes))
+
+    # Train
+    train_edges = np.array(train_edges)
+    train_edges_false = np.array(train_edges_false)
+    data_train = np.ones(train_edges.shape[0])
+    data_train_false = np.ones(train_edges_false.shape[0])
+
+    adj_train = sp.csr_matrix((data_train, (train_edges[:, 0], train_edges[:, 1])),shape=(num_nodes, num_nodes))
+    adj_train_false = sp.csr_matrix((data_train_false, (train_edges_false[:, 0], train_edges_false[:, 1])),shape=(num_nodes, num_nodes))
+
+    return adj, adj_train, adj_train_false, (train_edges, train_edges_false), (s1_edges, s1_edges_false), (s2_edges, s2_edges_false), known_drugs, unknown_drugs
+
+
 def load_inductive_data(file_path='/path/to/inductive_data/fold1', drug_list=[], fold=1):
     # Load each data
     df_ddi_train = pd.read_csv(file_path+'/train.csv')
