@@ -67,13 +67,10 @@ class MVN_DDI(nn.Module):
         repr_t = torch.stack(repr_t, dim=-2)
         kge_heads = repr_h
         kge_tails = repr_t
-        # print(kge_heads.size(), kge_tails.size(), rels.size())
-        #attentions = self.co_attention(kge_heads, kge_tails)
-        # attentions = None
-        #scores = self.KGE(kge_heads, kge_tails, rels, attentions)
+        attentions = self.co_attention(kge_heads, kge_tails)
+        scores = self.KGE(kge_heads, kge_tails, rels, attentions)
 
-        #return scores
-        return kge_heads, kge_tails # torch.Size([1024, 4, 128])
+        return scores, kge_heads, kge_tails # torch.Size([1024, 4, 128])
 
 #intra+inter
 class MVN_DDI_Block(nn.Module):
